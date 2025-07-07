@@ -1,26 +1,20 @@
 const fs = require("fs");
+const trataErros = require("./erros/funcoesErro");
 
 const caminhoArquivo = process.argv;
 const link = caminhoArquivo[2];
 
 fs.readFile(link, "utf-8", (erro, texto) => {
-  quebraEmParagrafos(texto);
-  // verificaPalavrasDuplicadas(texto);
+  try {
+    if (erro) throw erro;
+    contaPalavras(texto);
+  } catch (erro) {
+    trataErros(erro);
+  }
 });
 
-// criar um array com as palavras
-// contar as ocorrências
-// montar um objeto com os resultados
-
-// {
-//   "web": 5,
-//   "computador": 4
-// }
-
-// /[.,\/#!$%\^&\*;:{}=\-_`~()]/g
-
-function quebraEmParagrafos(texto) {
-  const paragrafos = texto.toLowerCase().split("\n");
+function contaPalavras(texto) {
+  const paragrafos = extraiParagrafos(texto);
   const contagem = paragrafos.flatMap((paragrafo) => {
     if (!paragrafo) return [];
     return verificaPalavrasDuplicadas(paragrafo);
@@ -28,8 +22,9 @@ function quebraEmParagrafos(texto) {
   console.log(contagem);
 }
 
-// [1, 2, [3, 4]]
-// [1, 2, 3, 4]
+function extraiParagrafos(texto) {
+  return texto.toLowerCase().split("\n");
+}
 
 function limpaPalavras(palavra) {
   return palavra.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()\r]/g, "");
@@ -39,7 +34,6 @@ function verificaPalavrasDuplicadas(texto) {
   const listaPalavras = texto.split(" ");
   const resultado = {};
 
-  // objeto[propriedade] = valor;
   listaPalavras.forEach((palavra) => {
     if (palavra.length >= 3) {
       const palavraLimpa = limpaPalavras(palavra);
